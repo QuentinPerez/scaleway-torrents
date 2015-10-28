@@ -15,14 +15,51 @@ RUN sed -i 's/universe/universe multiverse/' /etc/apt/sources.list
 RUN apt-get -q update \
   && apt-get --force-yes -y -qq upgrade \
   && apt-get install -y \
-    supervisor \
-    rtorrent \
-    nginx \
-    php5-cli php5-fpm \
-    mediainfo unzip unrar \
+    automake \
+    autotools-dev \
+    build-essential \
+    git \
     libav-tools \
-    vsftpd libpam-pwdfile
+    libcurl4-openssl-dev \
+    libcppunit-dev \
+    libncurses-dev \
+    libpam-pwdfile \
+    libsigc++-2.0-dev \
+    libtool \
+    libxmlrpc-core-c3-dev \
+    mediainfo \
+    nginx \
+    php5-cli \
+    php5-fpm \
+    supervisor \
+    vsftpd \
+    unrar-free \
+    unzip \
+ && apt-get clean
 
+#
+# Install libtorrent from sources
+#
+RUN git clone --branch 0.13.6 https://github.com/rakshasa/libtorrent.git \
+ && cd libtorrent \
+ && ./autogen.sh \
+ && ./configure \
+ && make -j8 \
+ && make install \
+ && cd ..
+
+#
+# Install rtorrent from sources
+#
+ADD ./patches/configure.ac /
+RUN git clone --branch 0.9.6 https://github.com/rakshasa/rtorrent.git \
+ && mv /configure.ac /rtorrent \
+ && cd rtorrent \
+ && ./autogen.sh \
+ && ./configure --with-xmlrpc-c \
+ && make -j8 \
+ && make install \
+ && cd ..
 
 #
 # Rtorrent configuration
@@ -106,6 +143,8 @@ COPY ./patches/etc/init/vsftpd-keys.conf /etc/init/vsftpd-keys.conf
 #
 COPY ./patches/etc/php5/fpm/conf.d/50-scaleway.ini /etc/php5/fpm/conf.d/50-scaleway.ini
 
+RUN rm -fr /rtorrent \
+ && rm -fr /libtorrent
 
 # Clean rootfs from image-builder
 RUN /usr/local/sbin/builder-leave

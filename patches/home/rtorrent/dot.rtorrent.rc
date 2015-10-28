@@ -1,7 +1,7 @@
 system.umask.set = 022
 directory = /home/rtorrent/downloads
 session = /home/rtorrent/sessions
-set_max_file_size = 536870912000
+system.file.max_size.set = 536870912000
 schedule = watch_directory,0,10,"load_start=/home/rtorrent/watch/*.torrent"
 
 ## Network
@@ -12,8 +12,8 @@ port_random = yes
 ## Trackers / DHT
 dht = auto
 dht_port = 6881
-peer_exchange = yes
-use_udp_trackers = yes
+protocol.pex.set = yes
+trackers.use_udp.set = yes
 
 ## BitTorrent
 min_peers = 20
